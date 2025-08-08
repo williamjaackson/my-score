@@ -1,9 +1,9 @@
-import { Fingerprint, Home as HomeIcon, MapPin, Users } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@radix-ui/react-separator";
+import { Fingerprint } from "lucide-react";
 import MyScore from "./components/MyScore";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 
+// Home.tsx (Updated)
 export default function Home() {
   const name = "William Jackson";
   const firstName = name.split(" ")[0];
@@ -41,36 +41,6 @@ export default function Home() {
           </main>
         </Card>
       </div>
-
-      {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t border-gray-200 shadow-lg max-w-lg mx-auto z-50">
-        <div className="flex justify-around items-center py-3">
-          <Button
-            variant="ghost"
-            className="flex flex-col items-center gap-1 text-blue-600 data-[active=true]:text-blue-700 transition-colors"
-            data-active="true"
-          >
-            <HomeIcon size={26} />
-            <span className="text-xs font-medium">Home</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
-          >
-            <MapPin size={26} />
-            <span className="text-xs font-medium">Community</span>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
-          >
-            <Users size={26} />
-            <span className="text-xs font-medium">Friends</span>
-          </Button>
-        </div>
-      </nav>
     </div>
   );
 }

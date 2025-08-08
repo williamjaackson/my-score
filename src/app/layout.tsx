@@ -1,6 +1,15 @@
+// layout.tsx (Updated)
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import {
+  Home as HomeIcon,
+  MapPin,
+  MessageSquareMore,
+  Users,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +36,48 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-100`}
       >
-        <div className="bg-white min-h-screen max-w-lg mx-auto overflow-hidden">
+        <div className="bg-white min-h-screen max-w-lg mx-auto overflow-hidden relative">
           {children}
+
+          {/* Bottom Navigation Bar */}
+          <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur shadow-lg max-w-lg mx-auto z-50">
+            <Card className="p-0 rounded-none shadow-none">
+              <div className="flex justify-around items-center py-3">
+                <Button
+                  variant="ghost"
+                  className="flex flex-col items-center gap-1 text-blue-600 data-[active=true]:text-blue-700 transition-colors"
+                  data-active="true"
+                >
+                  <HomeIcon size={26} />
+                  <span className="text-xs font-medium">Home</span>
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                >
+                  <MessageSquareMore size={26} />
+                  <span className="text-xs font-medium">Reviews</span>
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                >
+                  <MapPin size={26} />
+                  <span className="text-xs font-medium">Community</span>
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-600 transition-colors"
+                >
+                  <Users size={26} />
+                  <span className="text-xs font-medium">Friends</span>
+                </Button>
+              </div>
+            </Card>
+          </nav>
         </div>
       </body>
     </html>
