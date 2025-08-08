@@ -3,8 +3,8 @@ import React from "react";
 export default function MyScore() {
   const score = 500; // Current score
   const maxScore = 1000; // Max score
-  const radius = 80; // Increased circle radius
-  const strokeWidth = 30; // Optionally increase stroke thickness for proportion
+  const radius = 60; // Increased circle radius
+  const strokeWidth = 20; // Optionally increase stroke thickness for proportion
   const circumference = 2 * Math.PI * radius; // Circle circumference
   const progress = (score / maxScore) * circumference; // Progress length
   const size = radius * 2 + strokeWidth; // SVG size to fit circle and stroke
@@ -62,7 +62,7 @@ export default function MyScore() {
           {score}
         </span>
       </div>
-      <div className="absolute right-4 bottom-4">
+      <div className="absolute right-4 bottom-4 text-xs grid gap-1">
         <div className="flex items-center gap-2">
           <span
             style={{
@@ -73,7 +73,7 @@ export default function MyScore() {
               background: "#9f38b5",
             }}
           />
-          <span className="text-sm text-foreground">Reviews</span>
+          <span className="text-foreground">Reviews</span>
         </div>
         <div className="flex items-center gap-2">
           <span
@@ -85,7 +85,7 @@ export default function MyScore() {
               background: "#38b544ff",
             }}
           />
-          <span className="text-sm text-foreground">Community</span>
+          <span className="text-foreground">Community</span>
         </div>
       </div>
     </div>
