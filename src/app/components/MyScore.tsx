@@ -3,7 +3,7 @@ import React from "react";
 export default function MyScore() {
   const score = 500; // Current score
   const maxScore = 1000; // Max score
-  const radius = 100; // Increased circle radius
+  const radius = 80; // Increased circle radius
   const strokeWidth = 30; // Optionally increase stroke thickness for proportion
   const circumference = 2 * Math.PI * radius; // Circle circumference
   const progress = (score / maxScore) * circumference; // Progress length
@@ -61,6 +61,32 @@ export default function MyScore() {
         >
           {score}
         </span>
+      </div>
+      <div className="absolute right-4 bottom-4">
+        <div className="flex items-center gap-2">
+          <span
+            style={{
+              display: "inline-block",
+              width: 16,
+              height: 16,
+              borderRadius: "50%",
+              background: "#9f38b5",
+            }}
+          />
+          <span className="text-sm text-foreground">Reviews</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span
+            style={{
+              display: "inline-block",
+              width: 16,
+              height: 16,
+              borderRadius: "50%",
+              background: "#38b544ff",
+            }}
+          />
+          <span className="text-sm text-foreground">Community</span>
+        </div>
       </div>
     </div>
   );
