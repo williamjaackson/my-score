@@ -17,7 +17,7 @@ export async function GET(
     const [longitude, latitude] = coords[0];
 
     // 2. Search nearby users within 10 km radius of that point
-    const nearbyUsers = await redis.geosearch(
+    const nearbyUsers = (await redis.geosearch(
       "user_locations",
       "FROMLONLAT",
       longitude,
@@ -28,12 +28,12 @@ export async function GET(
       "WITHDIST",
       "WITHCOORD",
       "ASC"
-    );
+    )) as [string, number, [number, number]][];
 
     return NextResponse.json({
-      nearbyUsers: await Promise.all(
-        nearbyUsers
-          .map(async (user) => ({
+      nearbyUsers: (
+        await Promise.all(
+          nearbyUsers.map(async (user) => ({
             id: user[0],
             distance: user[1],
             coordinates: {
@@ -45,8 +45,8 @@ export async function GET(
               select: { name: true },
             }),
           }))
-          .filter((user) => user.id !== userId)
-      ), // Exclude the current user
+        )
+      ).filter((user) => user.id !== userId), // Exclude the current user
     });
   } catch (error) {
     console.error("Error finding nearby users:", error);
