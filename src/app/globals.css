@@ -55,7 +55,7 @@
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: #0c516a;
-  --secondary-foreground: #1a7285;
+  --secondary-foreground: white;
   --logo: #f5de0e;
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);

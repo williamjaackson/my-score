@@ -1,6 +1,6 @@
 "use client";
 
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {
@@ -10,8 +10,8 @@ import {
   MessageSquareMore,
   Users,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+// import { Button } from "@/components/ui/button";
+// import { Card } from "@/components/ui/card";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/logo";
@@ -41,14 +41,14 @@ export default function RootLayout({
   ];
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased h-full m-0 p-0`}
       >
         <div className="flex min-h-screen bg-secondary">
           {/* Sidebar for desktop */}
-          <aside className="hidden md:flex flex-col w-64 bg-white text-gray-900 p-4 border-r border-gray-200">
-            <Logo className="mb-6 mx-auto" theme="light" />
+          <aside className="z-10 hidden md:flex flex-col w-64 bg-white text-gray-900 p-4 border-r border-gray-200">
+            <Logo className="mb-4 p-2 mx-auto" theme="light" />
             <nav className="space-y-1">
               {navItems.map(({ href, label, icon: Icon }) => {
                 const isActive = pathname === href;
@@ -73,8 +73,33 @@ export default function RootLayout({
               })}
             </nav>
           </aside>
+
           {/* Main content */}
-          <main className="flex-1 p-4 pb-16 md:pb-4">{children}</main>
+          <main className="flex-1 p-4 pb-16 md:pb-4 pattern-bg relative overflow-hidden">
+            {/* Background text container */}
+            <div className="select-none whitespace-nowrap pointer-events-none opacity-1 absolute inset-0 overflow-hidden">
+              <p className="font-extrabold text-secondary-foreground absolute top-20 right-30 transform rotate-[30deg] scale-1600 hidden md:block">
+                ALWAYS
+              </p>
+              <p className="font-extrabold text-secondary-foreground absolute top-50 right-80 transform rotate-[30deg] scale-1600 hidden md:block">
+                WATCHING
+              </p>
+              <p className="font-extrabold text-secondary-foreground absolute top-80 right-130 transform rotate-[30deg] scale-1600 hidden md:block">
+                GOTOSLEEP
+              </p>
+              <p className="font-extrabold text-secondary-foreground absolute top-110 right-180 transform rotate-[30deg] scale-1600 hidden md:block">
+                MYLIFEMYSCORE
+              </p>
+              <p className="font-extrabold text-secondary-foreground absolute top-140 right-240 transform rotate-[30deg] scale-1600 hidden md:block">
+                RATEEVERYTHING
+              </p>
+              <p className="font-extrabold text-secondary-foreground absolute top-180 right-290 transform rotate-[30deg] scale-1600 hidden md:block">
+                NOESCAPE
+              </p>
+            </div>
+            <div className="relative">{children}</div>
+          </main>
+
           {/* Bottom nav for mobile */}
           <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50 flex justify-around items-center py-2 border-t border-gray-200 md:hidden">
             {navItems.map(({ href, label, icon: Icon }) => {
@@ -114,88 +139,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-// <div className="bg-slate-100">
-//           {/* Mobile Container */}
-//           <div className="bg-white min-h-screen mx-auto overflow-hidden relative md:hidden">
-//             {children}
-
-//             {/* Mobile Bottom Navigation Bar */}
-//             <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur shadow-lg mx-auto z-50">
-//               <Card className="p-0 rounded-none shadow-none">
-//                 <div className="flex justify-around items-center py-3">
-//                   {navItems.map(({ href, label, icon: Icon }) => {
-//                     const isActive =
-//                       pathname === href ||
-//                       (href !== "/" && pathname.startsWith(href));
-
-//                     return (
-//                       <Link
-//                         key={href}
-//                         href={href}
-//                         className="flex flex-col items-center"
-//                       >
-//                         <Button
-//                           variant="ghost"
-//                           className={`flex flex-col items-center gap-1 transition-colors ${
-//                             isActive
-//                               ? "text-blue-600"
-//                               : "text-gray-500 hover:text-blue-600"
-//                           }`}
-//                         >
-//                           <Icon size={26} />
-//                           <span className="text-xs font-medium">{label}</span>
-//                         </Button>
-//                       </Link>
-//                     );
-//                   })}
-//                 </div>
-//               </Card>
-//             </nav>
-//           </div>
-
-//           {/* Desktop Container */}
-//           <div className="hidden md:block bg-white min-h-screen">
-//             {/* Desktop Side Navigation */}
-//             <nav className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-50">
-//               <div className="p-6">
-//                 {/* Logo */}
-//                 <div className="flex items-center gap-2 mb-8">
-//                   <Fingerprint
-//                     className="text-blue-600 rotate-[20deg]"
-//                     size={32}
-//                   />
-//                   <span className="text-2xl font-semibold">myScore</span>
-//                 </div>
-
-//                 {/* Navigation Items */}
-//                 <div className="space-y-2">
-//                   {navItems.map(({ href, label, icon: Icon }) => {
-//                     const isActive =
-//                       pathname === href ||
-//                       (href !== "/" && pathname.startsWith(href));
-
-//                     return (
-//                       <Link key={href} href={href}>
-//                         <Button
-//                           variant={isActive ? "secondary" : "ghost"}
-//                           className={`w-full justify-start gap-3 h-12 ${
-//                             isActive
-//                               ? "bg-blue-50 text-blue-600 border-blue-200"
-//                               : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-//                           }`}
-//                         >
-//                           <Icon size={20} />
-//                           <span className="font-medium">{label}</span>
-//                         </Button>
-//                       </Link>
-//                     );
-//                   })}
-//                 </div>
-//               </div>
-//             </nav>
-
-//             {/* Desktop Main Content */}
-//             <main className="ml-64 min-h-screen">{children}</main>
-//           </div>
-//         </div>

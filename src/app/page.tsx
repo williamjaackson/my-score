@@ -8,14 +8,34 @@ export default function Home() {
   const firstName = name.split(" ")[0];
 
   return (
-    <Card className="w-min mx-auto mt-10">
-      {/* <CardHeader>
-        <CardTitle>My Score</CardTitle>
-      </CardHeader> */}
-      <CardContent>
-        <MyScore />
-      </CardContent>
-    </Card>
+    <>
+      <Card className="w-min mx-auto my-10 rounded-full">
+        <CardContent>
+          <MyScore />
+        </CardContent>
+      </Card>
+      <div className="grid grid-cols-2 gap-4 mt-10">
+        {/* two cards. card 1: GOod Morning, Wil */}
+        <Card>
+          {/* <CardHeader>
+            <CardTitle></CardTitle>
+          </CardHeader> */}
+          <CardContent>
+            <p>Good Morning,</p>
+            <p className="text-2xl font-semibold">William Jackson</p>
+          </CardContent>
+        </Card>
+        <Card>
+          {/* <CardHeader>
+            <CardTitle></CardTitle>
+          </CardHeader> */}
+          <CardContent>
+            <p>Good Morning,</p>
+            <p className="text-2xl font-semibold">William Jackson</p>
+          </CardContent>
+        </Card>
+      </div>
+    </>
   );
 
   return "children";

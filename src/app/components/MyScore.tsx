@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function MyScore() {
-  const score = 500; // Current score
+  const score = 250; // Current score
   const maxScore = 1000; // Max score
   const radius = 110; // Increased circle radius
   const strokeWidth = 20; // Optionally increase stroke thickness for proportion
@@ -22,20 +22,42 @@ export default function MyScore() {
             strokeWidth={strokeWidth}
             fill="transparent"
           />
-          {/* Progress circle 1 */}
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="#38b544ff"
+            stroke="limegreen"
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
-            strokeDashoffset={circumference - progress - 50}
+            strokeDashoffset={circumference - (800 / maxScore) * circumference}
             strokeLinecap="round"
             style={{ transition: "stroke-dashoffset 1s ease-out" }}
           />
-          {/* Progress circle 2 */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="skyblue"
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference - (600 / maxScore) * circumference}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dashoffset 1s ease-out" }}
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="orange"
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference - (400 / maxScore) * circumference}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dashoffset 1s ease-out" }}
+          />
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -44,13 +66,13 @@ export default function MyScore() {
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
-            strokeDashoffset={circumference - progress}
+            strokeDashoffset={circumference - (200 / maxScore) * circumference}
             strokeLinecap="round"
             style={{ transition: "stroke-dashoffset 1s ease-out" }}
           />
         </svg>
         <span
-          className="text-4xl font-bold text-foreground"
+          className="text-5xl font-bold text-foreground"
           style={{
             position: "absolute",
             top: "50%",
