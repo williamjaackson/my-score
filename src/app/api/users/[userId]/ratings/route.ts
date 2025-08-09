@@ -1,14 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
-import prisma from '@/lib/prisma';
+import prisma from "@/lib/prisma";
 
-export async function GET(request, { params }) {
-
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
   const { userId } = await params;
 
   const users = await prisma.user.findMany({
     where: {
-      id: userId
+      id: userId,
     },
     include: {
       ratings: true,
@@ -16,19 +18,22 @@ export async function GET(request, { params }) {
     },
   });
 
-
-
   return NextResponse.json(users);
 }
-export async function POST(request, { params }) {
-   const authorId = request.headers.get('x-user-id');
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
+  const authorId = request.headers.get("x-user-id");
   const { userId } = await params;
   const body = await request.json();
   const { rating, comment } = body;
 
-
   if (!userId || !rating) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
   }
   const existingRating = await prisma.rating.findFirst({
     where: {
@@ -41,16 +46,18 @@ export async function POST(request, { params }) {
   });
 
   if (existingRating) {
-    return NextResponse.json({ error: 'You have already rated this user in the last 24 hours' }, { status: 400 });
+    return NextResponse.json(
+      { error: "You have already rated this user in the last 24 hours" },
+      { status: 400 }
+    );
   }
 
   const rate = await prisma.rating.create({
     data: {
       targetId: userId,
       authorId,
-      rating: rating == 1 ? 'POSITIVE' : 'NEGATIVE',
+      rating: rating == 1 ? "POSITIVE" : "NEGATIVE",
       comment,
-     
     },
   });
 

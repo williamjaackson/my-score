@@ -3,10 +3,22 @@ import { Separator } from "@/components/ui/separator";
 import { Fingerprint } from "lucide-react";
 import MyScore from "./components/MyScore";
 
-// Home.tsx (Updated)
 export default function Home() {
   const name = "William Jackson";
   const firstName = name.split(" ")[0];
+
+  return (
+    <Card className="w-min mx-auto mt-10">
+      {/* <CardHeader>
+        <CardTitle>My Score</CardTitle>
+      </CardHeader> */}
+      <CardContent>
+        <MyScore />
+      </CardContent>
+    </Card>
+  );
+
+  return "children";
 
   return (
     <div className="bg-secondary grid min-h-screen relative">
