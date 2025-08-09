@@ -9,10 +9,7 @@ function storeLocationData(
   // Store the location data in Redis or any other storage
   return redis.geoadd("user_locations", longitude, latitude, userId);
 }
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
+export async function PUT(request: NextRequest) {
   const userId = await request.headers.get("x-user-id");
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });

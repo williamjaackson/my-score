@@ -16,7 +16,7 @@ import CircularScore from "@/components/score/Score"; // ✅ Import our new comp
 export default async function ProfilePage({
   params,
 }: {
-  params: { profileId: string };
+  params: Promise<{ profileId: string }>;
 }) {
   const { profileId } = await params;
 

@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
 
@@ -21,7 +21,7 @@ export async function GET(
       otherScore: true,
       relationScore: true,
       ratingScore: true,
-    }
+    },
   });
 
   if (!user) {
@@ -33,12 +33,17 @@ export async function GET(
 
   for (let i = 0; i < ratings.length; i++) {
     const currentRatingValue = ratings[i].rating === "POSITIVE" ? 1 : 0;
-    runningAverage = runningAverage + (currentRatingValue - runningAverage) / (i + 1);
+    runningAverage =
+      runningAverage + (currentRatingValue - runningAverage) / (i + 1);
   }
 
   const rating = ratings.length > 0 ? runningAverage : 0;
 
-  const totalScore = user.relationScore + user.criminalScore + user.otherScore + user.ratingScore;
+  const totalScore =
+    user.relationScore +
+    user.criminalScore +
+    user.otherScore +
+    user.ratingScore;
 
   return NextResponse.json({
     ...user,
