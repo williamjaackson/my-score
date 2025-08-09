@@ -49,7 +49,9 @@ export default function RootLayout({
         <div className="flex min-h-screen bg-secondary">
           {/* Sidebar for desktop */}
           <aside className="z-10 hidden md:flex flex-col w-64 bg-white text-gray-900 p-4 border-r border-gray-200">
-            <Logo className="mb-4 p-2 mx-auto" theme="light" />
+            <Link href="/" className="mx-auto">
+              <Logo className="mb-4 p-2" theme="light" />
+            </Link>
             <nav className="space-y-1">
               {navItems.map(({ href, label, icon: Icon }) => {
                 const isActive = pathname === href;
@@ -98,6 +100,7 @@ export default function RootLayout({
                 NOESCAPE
               </p>
             </div>
+            <Fingerprint className="text-secondary-foreground absolute top-20 right-30 transform rotate-[30deg] scale-1600 md:hidden opacity-10" />
             <div className="relative">
               <Logo className="mb-2 pl-4 pt-4 mx-auto md:hidden" theme="dark" />
               {children}

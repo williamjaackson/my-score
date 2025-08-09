@@ -26,7 +26,7 @@ export default function MyScore() {
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="limegreen"
+            stroke="#e8c40eff"
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
@@ -34,11 +34,11 @@ export default function MyScore() {
             strokeLinecap="round"
             style={{ transition: "stroke-dashoffset 1s ease-out" }}
           />
-          <circle
+          {/* <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="skyblue"
+            stroke="#D4A373"
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
@@ -50,7 +50,7 @@ export default function MyScore() {
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="orange"
+            stroke="#A78EB2"
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
@@ -62,14 +62,14 @@ export default function MyScore() {
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke="#9f38b5"
+            stroke="#6CA6A3"
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
             strokeDashoffset={circumference - (200 / maxScore) * circumference}
             strokeLinecap="round"
             style={{ transition: "stroke-dashoffset 1s ease-out" }}
-          />
+          /> */}
         </svg>
         <span
           className="text-5xl font-bold text-foreground"
@@ -83,6 +83,18 @@ export default function MyScore() {
         >
           {score}
         </span>
+        {/* <span
+          className="text-sm text-muted-foreground"
+          style={{
+            position: "absolute",
+            top: "65%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            pointerEvents: "none",
+          }}
+        >
+          Click to Change
+        </span> */}
       </div>
       {/* <div className="absolute right-4 bottom-4 text-xs grid gap-1">
         <div className="flex items-center gap-2">
