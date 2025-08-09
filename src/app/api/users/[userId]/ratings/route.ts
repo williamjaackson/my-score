@@ -29,7 +29,7 @@ export async function POST(
   const body = await request.json();
   const { rating, comment } = body;
 
-  if (!userId || !rating) {
+  if (!userId || !rating || !authorId) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
