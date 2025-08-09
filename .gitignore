@@ -47,3 +47,6 @@ next-env.d.ts
 
 # prisma
 /src/generated/prisma
+
+# redis
+dump.rdb
