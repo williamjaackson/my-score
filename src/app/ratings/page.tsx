@@ -34,7 +34,7 @@ export default async function Ratings() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 mt-4">
+            <p className="text-sm text-white text-center mt-4">
               You haven't received any ratings yet.
             </p>
           )}
@@ -48,7 +48,7 @@ export default async function Ratings() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 mt-4">
+            <p className="text-sm text-white text-center mt-4">
               You haven't given any ratings yet.
             </p>
           )}

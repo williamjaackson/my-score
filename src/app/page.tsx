@@ -10,6 +10,7 @@ import CircularScore from "@/components/score/Score";
 import TotalScore from "./TotalScore";
 import ScoreBreakdown from "./ScoreBreakdown";
 import { ScoreProvider } from "@/components/score/ScoreContext";
+import ViewPublicProfile from "./ViewPublicProfile";
 
 export default async function Home() {
   const { userId, name } = await useToken();
@@ -68,6 +69,9 @@ export default async function Home() {
               </div>
             </CardContent>
           </Card>
+        </div>
+        <div className="mx-auto w-fit my-4 text-white">
+          <ViewPublicProfile />
         </div>
       </div>
     </ScoreProvider>

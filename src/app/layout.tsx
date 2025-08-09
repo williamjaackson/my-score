@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import {
   Fingerprint,
+  Gift,
   Home as HomeIcon,
   MapPin,
   MessageSquareMore,
@@ -17,6 +18,7 @@ import Link from "next/link";
 import Logo from "@/components/logo";
 import { Toaster } from "@/components/ui/sonner";
 import GeolocationTracker from "@/components/GeolocationTracker";
+import { ScoreProvider } from "@/components/score/ScoreContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +41,7 @@ export default function RootLayout({
     { href: "/", label: "Home", icon: HomeIcon },
     { href: "/ratings", label: "Ratings", icon: MessageSquareMore },
     { href: "/community", label: "Community", icon: MapPin },
-    { href: "/friends", label: "Friends", icon: Users },
+    { href: "/perks", label: "Perks", icon: Gift },
   ];
 
   return (
@@ -81,34 +83,39 @@ export default function RootLayout({
           </aside>
 
           {/* Main content */}
-          <main className="flex-1 pb-16 md:pb-4 pattern-bg relative overflow-hidden">
-            {/* Background text container */}
-            <div className="select-none whitespace-nowrap pointer-events-none opacity-1 absolute inset-0 overflow-hidden">
-              <p className="font-extrabold text-secondary-foreground fixed top-20 right-30 transform rotate-[30deg] scale-1600 hidden md:block">
-                ALWAYS
-              </p>
-              <p className="font-extrabold text-secondary-foreground fixed top-50 right-80 transform rotate-[30deg] scale-1600 hidden md:block">
-                WATCHING
-              </p>
-              <p className="font-extrabold text-secondary-foreground fixed top-80 right-130 transform rotate-[30deg] scale-1600 hidden md:block">
-                GOTOSLEEP
-              </p>
-              <p className="font-extrabold text-secondary-foreground fixed top-110 right-180 transform rotate-[30deg] scale-1600 hidden md:block">
-                MYLIFEMYSCORE
-              </p>
-              <p className="font-extrabold text-secondary-foreground fixed top-140 right-240 transform rotate-[30deg] scale-1600 hidden md:block">
-                RATEEVERYTHING
-              </p>
-              <p className="font-extrabold text-secondary-foreground fixed top-180 right-290 transform rotate-[30deg] scale-1600 hidden md:block">
-                NOESCAPE
-              </p>
-            </div>
-            <Fingerprint className="fixed text-secondary-foreground top-20 right-30 transform rotate-[30deg] scale-1600 md:hidden opacity-10" />
-            <div className="relative">
-              <Logo className="mb-2 pl-4 pt-4 mx-auto md:hidden" theme="dark" />
-              {children}
-            </div>
-          </main>
+          <ScoreProvider>
+            <main className="flex-1 pb-16 md:pb-4 pattern-bg relative overflow-hidden">
+              {/* Background text container */}
+              <div className="select-none whitespace-nowrap pointer-events-none opacity-1 absolute inset-0 overflow-hidden">
+                <p className="font-extrabold text-secondary-foreground fixed top-20 right-30 transform rotate-[30deg] scale-1600 hidden md:block">
+                  ALWAYS
+                </p>
+                <p className="font-extrabold text-secondary-foreground fixed top-50 right-80 transform rotate-[30deg] scale-1600 hidden md:block">
+                  WATCHING
+                </p>
+                <p className="font-extrabold text-secondary-foreground fixed top-80 right-130 transform rotate-[30deg] scale-1600 hidden md:block">
+                  GOTOSLEEP
+                </p>
+                <p className="font-extrabold text-secondary-foreground fixed top-110 right-180 transform rotate-[30deg] scale-1600 hidden md:block">
+                  MYLIFEMYSCORE
+                </p>
+                <p className="font-extrabold text-secondary-foreground fixed top-140 right-240 transform rotate-[30deg] scale-1600 hidden md:block">
+                  RATEEVERYTHING
+                </p>
+                <p className="font-extrabold text-secondary-foreground fixed top-180 right-290 transform rotate-[30deg] scale-1600 hidden md:block">
+                  NOESCAPE
+                </p>
+              </div>
+              <Fingerprint className="fixed text-secondary-foreground top-20 right-30 transform rotate-[30deg] scale-1600 md:hidden opacity-10" />
+              <div className="relative">
+                <Logo
+                  className="mb-2 pl-4 pt-4 mx-auto md:hidden"
+                  theme="dark"
+                />
+                {children}
+              </div>
+            </main>
+          </ScoreProvider>
 
           {/* Bottom nav for mobile */}
           <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50 flex justify-around items-center py-2 border-t border-gray-200 md:hidden">

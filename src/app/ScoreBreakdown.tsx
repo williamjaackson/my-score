@@ -23,24 +23,6 @@ export default function ScoreBreakdown() {
         {/* Scores Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1 justify-center">
           <CircularScore
-            score={loading ? 0 : scores.criminal}
-            maxScore={250}
-            radius={50}
-            strokeWidth={10}
-            segments={[
-              { value: loading ? 0 : scores.criminal, color: "#ef4444" },
-            ]}
-            label="Criminal"
-          />
-          <CircularScore
-            score={loading ? 0 : scores.other}
-            maxScore={250}
-            radius={50}
-            strokeWidth={10}
-            segments={[{ value: loading ? 0 : scores.other, color: "#8b5cf6" }]}
-            label="Other"
-          />
-          <CircularScore
             score={loading ? 0 : scores.rating}
             maxScore={250}
             radius={50}
@@ -58,7 +40,25 @@ export default function ScoreBreakdown() {
             segments={[
               { value: loading ? 0 : scores.relation, color: "#3b82f6" },
             ]}
-            label="Relation"
+            label="Community"
+          />
+          <CircularScore
+            score={loading ? 0 : scores.criminal}
+            maxScore={250}
+            radius={50}
+            strokeWidth={10}
+            segments={[
+              { value: loading ? 0 : scores.criminal, color: "#ef4444" },
+            ]}
+            label="Criminal"
+          />
+          <CircularScore
+            score={loading ? 0 : scores.other}
+            maxScore={250}
+            radius={50}
+            strokeWidth={10}
+            segments={[{ value: loading ? 0 : scores.other, color: "#8b5cf6" }]}
+            label="Other"
           />
         </div>
       </CardContent>
