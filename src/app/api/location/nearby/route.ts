@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       longitude,
       latitude,
       "BYRADIUS",
-      10000, // Changed to 10000 meters for 10km
+      1, 
       "m",
       "WITHDIST",
       "WITHCOORD",
