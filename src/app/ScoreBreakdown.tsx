@@ -3,32 +3,16 @@
 import CircularScore from "@/components/score/Score";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { useEffect, useState } from "react";
+import { useScore } from "@/components/score/ScoreContext";
 
 export default function ScoreBreakdown() {
-  const [scores, setScores] = useState<{ [key: string]: number }>({
-    criminal: 0,
-    other: 0,
-    rating: 0,
-    relation: 0,
-  });
-
-  useEffect(() => {
-    async function fetchScore() {
-      const userRes = await fetch("/api/auth/me");
-      const userData = await userRes.json();
-      const userId = userData.userId;
-      const scoreRes = await fetch(`/api/users/${userId}/score`);
-      const scoreData = await scoreRes.json();
-      setScores({
-        criminal: scoreData.criminalScore,
-        other: scoreData.otherScore,
-        rating: scoreData.ratingScore,
-        relation: scoreData.relationScore,
-      });
-    }
-    fetchScore();
-  }, []);
+  const { score, loading } = useScore();
+  const scores = {
+    criminal: score?.criminalScore ?? 0,
+    other: score?.otherScore ?? 0,
+    rating: score?.ratingScore ?? 0,
+    relation: score?.relationScore ?? 0,
+  };
 
   return (
     <Card className="mt-10">
@@ -39,35 +23,41 @@ export default function ScoreBreakdown() {
         {/* Scores Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1 justify-center">
           <CircularScore
-            score={scores.criminal}
+            score={loading ? 0 : scores.criminal}
             maxScore={250}
             radius={50}
             strokeWidth={10}
-            segments={[{ value: scores.criminal, color: "#ef4444" }]}
+            segments={[
+              { value: loading ? 0 : scores.criminal, color: "#ef4444" },
+            ]}
             label="Criminal"
           />
           <CircularScore
-            score={scores.other}
+            score={loading ? 0 : scores.other}
             maxScore={250}
             radius={50}
             strokeWidth={10}
-            segments={[{ value: scores.other, color: "#8b5cf6" }]}
+            segments={[{ value: loading ? 0 : scores.other, color: "#8b5cf6" }]}
             label="Other"
           />
           <CircularScore
-            score={scores.rating}
+            score={loading ? 0 : scores.rating}
             maxScore={250}
             radius={50}
             strokeWidth={10}
-            segments={[{ value: scores.rating, color: "#10b981" }]}
+            segments={[
+              { value: loading ? 0 : scores.rating, color: "#10b981" },
+            ]}
             label="Rating"
           />
           <CircularScore
-            score={scores.relation}
+            score={loading ? 0 : scores.relation}
             maxScore={250}
             radius={50}
             strokeWidth={10}
-            segments={[{ value: scores.relation, color: "#3b82f6" }]}
+            segments={[
+              { value: loading ? 0 : scores.relation, color: "#3b82f6" },
+            ]}
             label="Relation"
           />
         </div>

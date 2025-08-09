@@ -5,9 +5,11 @@ import { redirect } from "next/navigation";
 import { RedirectType } from "next/navigation";
 import { useToken } from "@/hooks/useToken";
 import Link from "next/link";
+
 import CircularScore from "@/components/score/Score";
 import TotalScore from "./TotalScore";
 import ScoreBreakdown from "./ScoreBreakdown";
+import { ScoreProvider } from "@/components/score/ScoreContext";
 
 export default async function Home() {
   const { userId, name } = await useToken();
@@ -26,7 +28,7 @@ export default async function Home() {
     });
 
   return (
-    <>
+    <ScoreProvider>
       <div className="p-4 max-w-3xl mx-auto">
         <TotalScore />
         <ScoreBreakdown />
@@ -68,6 +70,6 @@ export default async function Home() {
           </Card>
         </div>
       </div>
-    </>
+    </ScoreProvider>
   );
 }
