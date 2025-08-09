@@ -30,8 +30,8 @@ class ProximityTracker {
             scheduled: false
         });
 
-        // Batch store accumulated time every 5 minutes
-        this.batchStoreJob = cron.schedule('*/5 * * * *', async () => {
+        // Batch store accumulated time every 1 minutes
+        this.batchStoreJob = cron.schedule('*/1 * * * *', async () => {
             await this.batchStoreAccumulatedTime();
         }, {
             scheduled: false
@@ -101,6 +101,9 @@ class ProximityTracker {
                 if (!previousNearby.includes(nearbyId)) {
                     await this.handleProximityEvent(userId, nearbyId, 'enter');
                 }
+                else {
+                    await this.handleProximityEvent(userId, nearbyId, 'inProximity');
+                }
             }
 
             // Check for lost proximities (exit events)
@@ -127,51 +130,93 @@ class ProximityTracker {
         const key = `proximity:${userId}:${nearbyUserId}`;
 
         if (action === 'enter') {
-            await redis.hset(key, 'startTime', timestamp);
+            const sessionId = await this.createProximitySession(userId, nearbyUserId, timestamp, 0);
+            if (!sessionId) {
+                console.error(`Failed to create session for ${userId} - ${nearbyUserId}`);
+                return;
+            }
+            await redis.hset(key, 'startTime', timestamp, 'sessionId', sessionId);
             console.log(`User ${userId} entered proximity of ${nearbyUserId}`);
+        } else if (action === 'inProximity') {
+            // Just verify the session exists, no duration calculation needed
+            const startTime = await redis.hget(key, 'startTime');
+            const sessionId = await redis.hget(key, 'sessionId');
+            if (!startTime || !sessionId) {
+                console.error(`No active session found for ${userId} - ${nearbyUserId}`);
+                return;
+            }
+            console.log(`User ${userId} still in proximity of ${nearbyUserId}`);
         } else if (action === 'exit') {
             const startTime = await redis.hget(key, 'startTime');
-            if (startTime) {
+            const sessionId = await redis.hget(key, 'sessionId');
+            if (startTime && sessionId) {
                 const duration = timestamp - parseInt(startTime);
 
-                // Store in Redis (existing)
-                await redis.hincrby(`total_time_near:${userId}:${nearbyUserId}`, 'totalMs', duration);
-                await redis.hdel(key, 'startTime');
+                // Store total time in Redis for batch processing
+                const totalTimeKey = `total_time_near:${userId}:${nearbyUserId}`;
+                const exists = await redis.hexists(totalTimeKey, 'totalMs');
+                if (!exists) {
+                    await redis.hset(totalTimeKey, 'totalMs', 0);
+                }
+                await redis.hincrby(totalTimeKey, 'totalMs', duration);
 
-                // Store individual session in SQLite using Prisma
-                await this.storeProximitySession(userId, nearbyUserId, parseInt(startTime), timestamp, duration);
+                // Clean up Redis session data
+                await redis.hdel(key, 'startTime', 'sessionId');
+
+                // End the proximity session in database
+                await this.endProximitySession(parseInt(sessionId), parseInt(startTime), timestamp);
 
                 console.log(`User ${userId} exited proximity of ${nearbyUserId}, duration: ${Math.round(duration / 1000)}s`);
             }
         }
     }
 
-    async storeProximitySession(userId, nearbyUserId, startTime, endTime, duration) {
+    async createProximitySession(userId, nearbyUserId, startTime, duration) {
         try {
-            await prisma.proximitySession.create({
+            const session = await prisma.proximitySession.create({
                 data: {
                     userId,
                     nearbyUserId,
                     startTime: BigInt(startTime),
+                    durationMs: BigInt(duration)
+                }
+            });
+            return session.id;
+        } catch (error) {
+            console.error('Error creating proximity session in SQLite:', error);
+        }
+    }
+    async endProximitySession(sessionId, startTime, endTime) {
+        try {
+            const duration = endTime - startTime;
+            const session = await prisma.proximitySession.update({
+                where: { id: sessionId },
+                data: {
                     endTime: BigInt(endTime),
                     durationMs: BigInt(duration)
                 }
             });
-
-            console.log(`Stored proximity session in SQLite: ${userId} - ${nearbyUserId}`);
+            console.log(`Ended proximity session ${sessionId}, duration: ${Math.round(duration / 1000)}s`);
         } catch (error) {
-            console.error('Error storing proximity session to SQLite:', error);
+            console.error('Error ending proximity session in SQLite:', error);
         }
     }
-
     async batchStoreAccumulatedTime() {
         try {
             const pattern = 'total_time_near:*';
             const keys = await redis.keys(pattern);
 
+            console.log(`Found ${keys.length} total_time_near keys to process`);
+
             for (const key of keys) {
-                const [, , userId, nearbyUserId] = key.split(':');
+                const keyParts = key.split(':');
+              
+
+                const userId = keyParts[1];
+                const nearbyUserId = keyParts[2];
                 const totalMs = await redis.hget(key, 'totalMs');
+                
+                console.log(`Processing key: ${key}, userId: ${userId}, nearbyUserId: ${nearbyUserId}, totalMs: ${totalMs}`);
 
                 if (totalMs && parseInt(totalMs) > 0) {
                     await this.updateTotalProximityTime(userId, nearbyUserId, parseInt(totalMs));
@@ -244,7 +289,7 @@ class ProximityTracker {
                 });
 
                 console.log(`Created RelatedUser record: ${userId} - ${nearbyUserId} (${Math.round(totalTimeMs / 3600000)}h)`);
-                
+
                 // Update relation scores for both users
                 await this.updateRelationScore(userId);
                 await this.updateRelationScore(nearbyUserId);
@@ -263,7 +308,7 @@ class ProximityTracker {
                 });
 
                 console.log(`Updated RelatedUser record: ${userId} - ${nearbyUserId} (${Math.round(totalTimeMs / 3600000)}h)`);
-                
+
                 // Update relation scores for both users since time spent changed
                 await this.updateRelationScore(userId);
                 await this.updateRelationScore(nearbyUserId);
@@ -284,14 +329,19 @@ class ProximityTracker {
             const totalOtherScore = otherScores.reduce((sum, score) => sum + score.score, 0);
 
             // Get existing relation score
-            const relationScore = await prisma.relationScore.findFirst({
-                where: { userId }
+            const user = await prisma.user.findFirst({
+                where: { id: userId },
+                select: {
+                    relationScore: true,
+                    criminalScore: true,
+                    otherScore: true,
+                    ratingScore: true
+                }
             });
 
-            const currentRelationScore = relationScore ? relationScore.score : 0;
 
             // Total score is other scores + relation score
-            return totalOtherScore + currentRelationScore;
+            return user.relationScore + user.criminalScore + totalOtherScore + user.ratingScore;
         } catch (error) {
             console.error(`Error calculating total score for user ${userId}:`, error);
             return 0;

@@ -13,7 +13,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { userId: string } }
 ) {
-  const { userId } = await params;
+  const userId = await request.headers.get("x-user-id");
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }
