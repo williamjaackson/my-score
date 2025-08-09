@@ -17,7 +17,7 @@ export default async function Home() {
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
-  if (!user) redirect("/auth/login", RedirectType.replace);
+  if (!user) redirect("/login", RedirectType.replace);
   if (!user?.email)
     tasks.push({
       icon: <Lock className="h-4 w-4" />,
