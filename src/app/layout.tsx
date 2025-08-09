@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/logo";
 import { Toaster } from "@/components/ui/sonner";
+import GeolocationTracker from "@/components/GeolocationTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -144,6 +145,7 @@ export default function RootLayout({
             })}
           </nav>
         </div>
+        <GeolocationTracker />
         <Toaster />
       </body>
     </html>
