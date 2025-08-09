@@ -20,7 +20,6 @@ export default async function Home() {
             <MyScore />
           </CardContent>
         </Card>
-        <Separator className="my-4" />
         <div className="grid md:grid-cols-2 gap-4 mt-10">
           {/* two cards. card 1: GOod Morning, Wil */}
           <Card>
