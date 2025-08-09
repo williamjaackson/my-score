@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  // Clear the session cookie by setting it to an empty value and a past expiration date
-  const response = NextResponse.json(
-    { message: "Sign out successful" },
-    { status: 200 }
-  );
+export async function GET(request: NextRequest) {
+  // Create a redirect response to "/"
+  const response = NextResponse.redirect(new URL("/", request.url), 302);
 
+  // Clear the session cookie by setting it to an empty value and a past expiration date
   response.cookies.set("session-token", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

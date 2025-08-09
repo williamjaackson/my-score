@@ -8,35 +8,28 @@ import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 
-export default function Register() {
+export default function Login() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-    const name = `${firstName} ${lastName}`;
-
-    const response = await fetch("/api/auth/signup", {
+    const response = await fetch("/api/auth/signin", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {
-      const errorData = response;
-      toast.error(`Registration failed: ${errorData || "Unknown error"}`);
-      console.error("Registration error:", errorData);
+      toast.error("Login failed. Please check your credentials.");
       return;
     }
 
-    console.log("Registration successful:", response);
-
-    const data = await response.json();
-    // Handle successful registration (e.g., redirect or show success message)
+    // Optionally handle login success (e.g., redirect)
     window.location.href = "/";
   }
 
@@ -45,45 +38,45 @@ export default function Register() {
       <Card className="w-full shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-gray-800">
-            Register with myScore
+            Login to myScore
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* First Name */}
+            <div className="grid gap-4">
+              {/* Email */}
               <div className="w-full space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  placeholder="Enter your first name"
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Enter your email"
                   required
                 />
               </div>
-              {/* Last Name */}
+              {/* Password */}
               <div className="w-full space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  placeholder="Enter your last name"
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
                   required
                 />
               </div>
             </div>
             {/* Submit Button */}
             <Button type="submit" className="w-full">
-              Register
+              Login
             </Button>
           </form>
           <div className="mt-4 text-center">
             <span className="text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 hover:underline">
-                Log in
+              Don't have an account?{" "}
+              <Link href="/register" className="text-blue-600 hover:underline">
+                Register here
               </Link>
             </span>
           </div>

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Fingerprint } from "lucide-react";
+import { Fingerprint, Lock, Mail, MailCheck } from "lucide-react";
 import MyScore from "./components/MyScore";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
@@ -8,9 +8,23 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { RedirectType } from "next/navigation";
 import { useToken } from "@/hooks/useToken";
+import Link from "next/link";
 
 export default async function Home() {
-  const { name } = await useToken();
+  const { userId, name } = await useToken();
+
+  const tasks = [];
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true },
+  });
+  if (!user?.email)
+    tasks.push({
+      icon: <Lock className="h-4 w-4" />,
+      text: "Add an authentication method.",
+      link: "/verify",
+    });
 
   return (
     <>
@@ -37,9 +51,22 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  You have no tasks for today.
-                </p>
+                {tasks.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    You have no tasks for today.
+                  </p>
+                ) : (
+                  tasks.map((task, index) => (
+                    <Link
+                      href={task.link}
+                      key={index}
+                      className="p-2 border rounded-md flex items-center gap-2 hover:bg-gray-100 transition-colors"
+                    >
+                      {task.icon}
+                      <span>{task.text}</span>
+                    </Link>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>

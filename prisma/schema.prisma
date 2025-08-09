@@ -23,19 +23,19 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  relatedUsers         RelatedUser[]
-  criminalRecords      CriminalRecord[]
-  others               Other[]
-  criminalScore        Int @default(250)
-  otherScore           Int @default(250)
-  ratingScore          Int @default(250)
-  relationScore        Int @default(250)
-  ratingsReceived      Rating[] @relation("RatedByUsers")
-  ratingsGiven         Rating[] @relation("UserRatings")
-  proximitySessionsAsUser    ProximitySession[] @relation("UserProximitySessions")
-  proximitySessionsAsNearby  ProximitySession[] @relation("NearbyUserProximitySessions")
-  proximityTotalsAsUser      UserProximityTotal[] @relation("UserProximityTotals")
-  proximityTotalsAsNearby    UserProximityTotal[] @relation("NearbyUserProximityTotals")
+  relatedUsers              RelatedUser[]
+  criminalRecords           CriminalRecord[]
+  others                    Other[]
+  criminalScore             Int                  @default(250)
+  otherScore                Int                  @default(250)
+  ratingScore               Int                  @default(250)
+  relationScore             Int                  @default(250)
+  ratingsReceived           Rating[]             @relation("RatedByUsers")
+  ratingsGiven              Rating[]             @relation("UserRatings")
+  proximitySessionsAsUser   ProximitySession[]   @relation("UserProximitySessions")
+  proximitySessionsAsNearby ProximitySession[]   @relation("NearbyUserProximitySessions")
+  proximityTotalsAsUser     UserProximityTotal[] @relation("UserProximityTotals")
+  proximityTotalsAsNearby   UserProximityTotal[] @relation("NearbyUserProximityTotals")
 
   @@index([email])
   @@index([createdAt])
@@ -47,15 +47,15 @@ enum RatingType {
 }
 
 model Rating {
-  id          String     @id @default(cuid())
-  targetId    String
-  target      User       @relation("RatedByUsers", fields: [targetId], references: [id], onDelete: Cascade)
-  rating      RatingType
-  comment     String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  authorId    String
-  author      User       @relation("UserRatings", fields: [authorId], references: [id], onDelete: Cascade)
+  id        String     @id @default(cuid())
+  targetId  String
+  target    User       @relation("RatedByUsers", fields: [targetId], references: [id], onDelete: Cascade)
+  rating    RatingType
+  comment   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  authorId  String
+  author    User       @relation("UserRatings", fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([authorId, targetId])
   @@index([targetId])
@@ -64,13 +64,13 @@ model Rating {
 }
 
 model RelatedUser {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  relatedUserId   String
-  spentTimeMs     Int      // Changed to milliseconds for consistency
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relatedUserId String
+  spentTimeMs   Int // Changed to milliseconds for consistency
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([userId, relatedUserId])
   @@index([userId])
@@ -78,27 +78,25 @@ model RelatedUser {
 }
 
 model CriminalRecord {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   description String
-  severity    String?  // Added severity field
+  severity    String? // Added severity field
   date        DateTime? // Date of the incident
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([userId])
   @@index([date])
 }
-
-
 
 model Other {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   score     Int
-  category  String?  // Added category for different score types
+  category  String? // Added category for different score types
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -107,16 +105,16 @@ model Other {
 }
 
 model ProximitySession {
-  id            Int      @id @default(autoincrement())
-  userId        String   @map("user_id")
-  user          User     @relation("UserProximitySessions", fields: [userId], references: [id], onDelete: Cascade)
-  nearbyUserId  String   @map("nearby_user_id")
-  nearbyUser    User     @relation("NearbyUserProximitySessions", fields: [nearbyUserId], references: [id], onDelete: Cascade)
-  startTime     BigInt   @map("start_time")
-  endTime       BigInt?  @map("end_time") // Made optional for ongoing sessions
-  durationMs    BigInt?  @map("duration_ms") // Made optional, calculated field
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id           Int      @id @default(autoincrement())
+  userId       String   @map("user_id")
+  user         User     @relation("UserProximitySessions", fields: [userId], references: [id], onDelete: Cascade)
+  nearbyUserId String   @map("nearby_user_id")
+  nearbyUser   User     @relation("NearbyUserProximitySessions", fields: [nearbyUserId], references: [id], onDelete: Cascade)
+  startTime    BigInt   @map("start_time")
+  endTime      BigInt?  @map("end_time") // Made optional for ongoing sessions
+  durationMs   BigInt?  @map("duration_ms") // Made optional, calculated field
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@unique([userId, nearbyUserId, startTime])
   @@index([userId])
@@ -127,15 +125,15 @@ model ProximitySession {
 }
 
 model UserProximityTotal {
-  userId           String   @map("user_id")
-  user             User     @relation("UserProximityTotals", fields: [userId], references: [id], onDelete: Cascade)
-  nearbyUserId     String   @map("nearby_user_id")
-  nearbyUser       User     @relation("NearbyUserProximityTotals", fields: [nearbyUserId], references: [id], onDelete: Cascade)
-  totalDurationMs  BigInt   @default(0) @map("total_duration_ms")
-  sessionCount     Int      @default(0) @map("session_count") // Track number of sessions
-  lastSessionAt    DateTime? @map("last_session_at") // When last session occurred
-  createdAt        DateTime @default(now()) @map("created_at")
-  lastUpdated      DateTime @default(now()) @updatedAt @map("last_updated")
+  userId          String    @map("user_id")
+  user            User      @relation("UserProximityTotals", fields: [userId], references: [id], onDelete: Cascade)
+  nearbyUserId    String    @map("nearby_user_id")
+  nearbyUser      User      @relation("NearbyUserProximityTotals", fields: [nearbyUserId], references: [id], onDelete: Cascade)
+  totalDurationMs BigInt    @default(0) @map("total_duration_ms")
+  sessionCount    Int       @default(0) @map("session_count") // Track number of sessions
+  lastSessionAt   DateTime? @map("last_session_at") // When last session occurred
+  createdAt       DateTime  @default(now()) @map("created_at")
+  lastUpdated     DateTime  @default(now()) @updatedAt @map("last_updated")
 
   @@id([userId, nearbyUserId])
   @@index([totalDurationMs])
