@@ -12,7 +12,7 @@ export async function GET(
     where: {
       id: userId,
     },
-    include: {
+    select: {
       ratings: true,
       sentRating: true,
     },
