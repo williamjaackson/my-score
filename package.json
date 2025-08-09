@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack & node src/worker/worker.js",
     "build": "next build",
-    "start": "next start",
+    "start": "next start & node src/worker/worker.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -22,7 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.539.0",
     "next": "15.4.6",
-    "next-themes": "^0.4.6",
+    "node-cron": "^4.2.1",
     "prisma": "^6.13.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",

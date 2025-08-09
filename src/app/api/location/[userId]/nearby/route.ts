@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import redis from "@/lib/redis";
 import prisma from "@/lib/prisma";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { userId: string } }
@@ -16,14 +17,14 @@ export async function GET(
 
     const [longitude, latitude] = coords[0];
 
-    // 2. Search nearby users within 10 km radius of that point
+    // Search nearby users within 10 km radius
     const nearbyUsers = (await redis.geosearch(
       "user_locations",
       "FROMLONLAT",
       longitude,
       latitude,
       "BYRADIUS",
-      10,
+      10000, // Changed to 10000 meters for 10km
       "m",
       "WITHDIST",
       "WITHCOORD",
@@ -33,18 +34,37 @@ export async function GET(
     return NextResponse.json({
       nearbyUsers: (
         await Promise.all(
-          nearbyUsers.map(async (user) => ({
-            id: user[0],
-            distance: user[1],
-            coordinates: {
-              longitude: user[2][0],
-              latitude: user[2][1],
-            },
-            profile: await prisma.user.findUnique({
-              where: { id: user[0] },
-              select: { name: true },
-            }),
-          }))
+          nearbyUsers.map(async (user) => {
+            // Get total time spent near this user
+            const totalTimeMs = await redis.hget(`total_time_near:${userId}:${user[0]}`, 'totalMs');
+            const totalTimeMinutes = totalTimeMs ? Math.round(parseInt(totalTimeMs) / (1000 * 60)) : 0;
+
+            // Check if currently in proximity (within 100m)
+            const currentlyNear = await redis.sismember(`current_nearby:${userId}`, user[0]);
+
+            return {
+              id: user[0],
+              distance: user[1],
+              coordinates: {
+                longitude: user[2][0],
+                latitude: user[2][1],
+              },
+              totalTimeSpentNear: totalTimeMinutes, // in minutes
+              currentlyInProximity: !!currentlyNear,
+              profile: await prisma.user.findUnique({
+                where: { id: user[0] },
+                select: {
+                  name: true,
+
+                  ratingScore: true,
+                  relationScore: true,
+                  criminalScore: true,
+                  otherScore: true,
+
+                },
+              }),
+            };
+          })
         )
       ).filter((user) => user.id !== userId), // Exclude the current user
     });
