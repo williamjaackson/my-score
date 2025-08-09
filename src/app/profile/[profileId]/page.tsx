@@ -1,8 +1,9 @@
 // app/profile/[profileId]/page.tsx
 import prisma from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import CircularScore from "@/components/score/Score"; // ✅ Import our new component
+import ProfileScoreDashboard from "@/components/profile/ProfileScoreDashboard";
 
 export default async function ProfilePage({
   params,
@@ -24,7 +25,7 @@ export default async function ProfilePage({
     where: { id: profileId },
     include: {
       ratingsReceived: { include: { author: true } },
-      relatedUsers: { include: { user: true } },
+      relatedUsers: true,
       criminalRecords: true,
     },
   });
@@ -34,147 +35,55 @@ export default async function ProfilePage({
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Profile Header */}
-      <Card className="w-fit rounded-full mx-auto">
-        <CardContent>
-          <CircularScore
-            score={879}
-            maxScore={1000}
-            radius={80}
-            strokeWidth={15}
-            segments={[{ value: 879, color: "#f5de0e" }]}
-            // label="Total Score"
-            showScore={true}
-            scoreFontSize="2.5rem"
-            // labelFontSize="1rem"
-          />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Scores Breakdown</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          {/* Scores Section */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1 justify-center">
-            <CircularScore
-              score={profile.criminalScore - 33}
-              maxScore={250}
-              radius={50}
-              strokeWidth={10}
-              segments={[
-                { value: profile.criminalScore - 33, color: "#ef4444" },
-              ]}
-              label="Criminal"
-            />
-            <CircularScore
-              score={profile.otherScore - 34}
-              maxScore={250}
-              radius={50}
-              strokeWidth={10}
-              segments={[{ value: profile.otherScore - 34, color: "#8b5cf6" }]}
-              label="Other"
-            />
-            <CircularScore
-              score={profile.ratingScore - 33}
-              maxScore={250}
-              radius={50}
-              strokeWidth={10}
-              segments={[{ value: profile.ratingScore - 33, color: "#10b981" }]}
-              label="Rating"
-            />
-            <CircularScore
-              score={profile.relationScore - 21}
-              maxScore={250}
-              radius={50}
-              strokeWidth={10}
-              segments={[
-                { value: profile.relationScore - 21, color: "#3b82f6" },
-              ]}
-              label="Relation"
-            />
+    <div className="max-w-6xl mx-auto p-6 space-y-10">
+      {/* Header (no gradients) */}
+      <div className="rounded-3xl border bg-white dark:bg-zinc-900 p-6 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+        <div>
+          <Avatar className="h-24 w-24 ring-2 ring-gray-200 dark:ring-zinc-700 shadow">
+            <AvatarFallback className="text-xl font-semibold bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-200">
+              {profile.name.substring(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+        <div className="flex-1 w-full space-y-3">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {profile.name}
+              </h1>
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Joined {new Date(profile.createdAt).toLocaleDateString()} •
+                Updated {new Date(profile.updatedAt).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href={`/profile/${profile.id}/rate`}
+                className="inline-flex items-center justify-center rounded-md border bg-gray-900 text-white dark:bg-white dark:text-gray-900 px-4 py-2 text-sm font-medium hover:opacity-90 transition"
+              >
+                Review User
+              </Link>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary" className="text-[11px]">
+              User ID: {profile.id.slice(0, 8)}…
+            </Badge>
+            <Badge variant="outline" className="text-[11px]">
+              Ratings: {profile.ratingsReceived.length}
+            </Badge>
+            <Badge variant="outline" className="text-[11px]">
+              Relations: {profile.relatedUsers.length}
+            </Badge>
+            <Badge variant="outline" className="text-[11px]">
+              Criminal Records: {profile.criminalRecords.length}
+            </Badge>
+          </div>
+        </div>
+      </div>
 
-      {/* Ratings Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Ratings Received</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {profile.ratingsReceived.length === 0 ? (
-            <p className="text-gray-500">No ratings yet</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>From</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Comment</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {profile.ratingsReceived.map((rating) => (
-                  <TableRow key={rating.id}>
-                    <TableCell>{rating.author.name}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          rating.rating === "POSITIVE"
-                            ? "default"
-                            : "destructive"
-                        }
-                      >
-                        {rating.rating}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{rating.comment || "-"}</TableCell>
-                    <TableCell>
-                      {new Date(rating.createdAt).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Criminal Records */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Criminal Records</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {profile.criminalRecords.length === 0 ? (
-            <p className="text-gray-500">No criminal records</p>
-          ) : (
-            <ul className="space-y-2">
-              {profile.criminalRecords.map((record) => (
-                <li
-                  key={record.id}
-                  className="p-3 border rounded-md bg-gray-50 flex justify-between"
-                >
-                  <div>
-                    <p className="font-medium">{record.description}</p>
-                    <p className="text-sm text-gray-500">
-                      Severity: {record.severity || "N/A"}
-                    </p>
-                  </div>
-                  <span className="text-sm text-gray-400">
-                    {record.date
-                      ? new Date(record.date).toLocaleDateString()
-                      : "No date"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
+      {/* Dynamic Score Dashboard (client) */}
+      <ProfileScoreDashboard userId={profile.id} />
     </div>
   );
 }

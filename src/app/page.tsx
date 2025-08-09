@@ -40,7 +40,14 @@ export default async function Home() {
             <CardTitle></CardTitle>
           </CardHeader> */}
             <CardContent>
-              <p>Good Morning,</p>
+              <p>
+                {(() => {
+                  const hour = new Date().getHours();
+                  if (hour < 12) return "Good Morning,";
+                  if (hour < 18) return "Good Afternoon,";
+                  return "Good Evening,";
+                })()}
+              </p>
               <p className="text-2xl font-semibold">{name}</p>
             </CardContent>
           </Card>

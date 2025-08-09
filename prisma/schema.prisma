@@ -27,8 +27,8 @@ model User {
   criminalRecords           CriminalRecord[]
   others                    Other[]
   criminalScore             Int                  @default(250)
-  otherScore                Int                  @default(250)
-  ratingScore               Int                  @default(250)
+  otherScore                Int                  @default(200)
+  ratingScore               Int                  @default(125)
   relationScore             Int                  @default(250)
   ratingsReceived           Rating[]             @relation("RatedByUsers")
   ratingsGiven              Rating[]             @relation("UserRatings")

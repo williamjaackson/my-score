@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-
 import prisma from "@/lib/prisma";
 
 export async function GET(
@@ -20,6 +19,7 @@ export async function GET(
 
   return NextResponse.json(users);
 }
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
@@ -29,18 +29,29 @@ export async function POST(
   const body = await request.json();
   const { rating, comment } = body;
 
-  if (!userId || !rating || !authorId) {
+  // rating should be +1 or -1
+  if (!userId || (rating !== 1 && rating !== -1) || !authorId) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
     );
   }
+
+  // Prevent self-rating
+  if (authorId === userId) {
+    return NextResponse.json(
+      { error: "You cannot rate yourself" },
+      { status: 403 }
+    );
+  }
+
+  // Check if already rated in last 24 hours
   const existingRating = await prisma.rating.findFirst({
     where: {
       targetId: userId,
       authorId: authorId,
       updatedAt: {
-        gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Check if rated in the last 24 hours
+        gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
       },
     },
   });
@@ -52,15 +63,37 @@ export async function POST(
     );
   }
 
+  // Create the rating
   const rate = await prisma.rating.create({
     data: {
       targetId: userId,
       authorId,
-      rating: rating == 1 ? "POSITIVE" : "NEGATIVE",
+      rating: rating === 1 ? "POSITIVE" : "NEGATIVE",
       comment,
+    },
+  });
+
+  // Recalculate average rating from scratch
+  const allRatings = await prisma.rating.findMany({
+    where: { targetId: userId },
+    select: { rating: true },
+  });
+
+  const totalReviews = allRatings.length;
+  const sumRatings = allRatings.reduce((sum, r) => {
+    return sum + (r.rating === "POSITIVE" ? 1 : -1);
+  }, 0);
+
+  const averageScore = totalReviews > 0 ? sumRatings / totalReviews : 0;
+  const averageRating = 125 * (averageScore + 1);
+
+  // Update user with new average score
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      ratingScore: averageRating,
     },
   });
 
   return NextResponse.json(rate);
 }
-//(score * totalreviews + newrating) / (totalreviews + 1)
