@@ -63,7 +63,6 @@ export async function middleware(request: NextRequest) {
 
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-user-id", decoded.userId);
-    requestHeaders.set("x-user-email", decoded.email);
 
     // Continue with the request
     return NextResponse.next({
@@ -78,5 +77,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/users/:path*"],
+  matcher: ["/api/users/:path*", "/api/auth/verify"],
 };
