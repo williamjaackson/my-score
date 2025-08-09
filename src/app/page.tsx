@@ -1,14 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Fingerprint, Lock, Mail, MailCheck } from "lucide-react";
-import MyScore from "./components/MyScore";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { Lock } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { RedirectType } from "next/navigation";
 import { useToken } from "@/hooks/useToken";
 import Link from "next/link";
+import CircularScore from "@/components/score/Score";
 
 export default async function Home() {
   const { userId, name } = await useToken();
@@ -17,8 +14,8 @@ export default async function Home() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true },
   });
+  if (!user) redirect("/auth/login", RedirectType.replace);
   if (!user?.email)
     tasks.push({
       icon: <Lock className="h-4 w-4" />,
@@ -28,13 +25,67 @@ export default async function Home() {
 
   return (
     <>
-      <div className="p-4">
+      <div className="p-4 max-w-3xl mx-auto">
         <Card className="w-fit mx-auto md:my-10 rounded-full">
           <CardContent className="flex gap-4">
-            <MyScore />
+            <CircularScore
+              score={879}
+              maxScore={1000}
+              radius={80}
+              strokeWidth={15}
+              segments={[{ value: 879, color: "#f5de0e" }]}
+              showScore={true}
+              scoreFontSize="2.5rem"
+            />
           </CardContent>
         </Card>
-        <div className="grid md:grid-cols-2 gap-4 mt-10">
+        <Card className="mt-10">
+          <CardHeader>
+            <CardTitle>Scores Breakdown</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center gap-4">
+            {/* Scores Section */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1 justify-center">
+              <CircularScore
+                score={user.criminalScore - 33}
+                maxScore={250}
+                radius={50}
+                strokeWidth={10}
+                segments={[
+                  { value: user.criminalScore - 33, color: "#ef4444" },
+                ]}
+                label="Criminal"
+              />
+              <CircularScore
+                score={user.otherScore - 34}
+                maxScore={250}
+                radius={50}
+                strokeWidth={10}
+                segments={[{ value: user.otherScore - 34, color: "#8b5cf6" }]}
+                label="Other"
+              />
+              <CircularScore
+                score={user.ratingScore - 33}
+                maxScore={250}
+                radius={50}
+                strokeWidth={10}
+                segments={[{ value: user.ratingScore - 33, color: "#10b981" }]}
+                label="Rating"
+              />
+              <CircularScore
+                score={user.relationScore - 21}
+                maxScore={250}
+                radius={50}
+                strokeWidth={10}
+                segments={[
+                  { value: user.relationScore - 21, color: "#3b82f6" },
+                ]}
+                label="Relation"
+              />
+            </div>
+          </CardContent>
+        </Card>
+        <div className="grid md:grid-cols-2 gap-4 mt-4">
           {/* two cards. card 1: GOod Morning, Wil */}
           <Card>
             {/* <CardHeader>

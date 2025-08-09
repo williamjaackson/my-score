@@ -36,7 +36,7 @@ export default function RootLayout({
 
   const navItems = [
     { href: "/", label: "Home", icon: HomeIcon },
-    { href: "/reviews", label: "Reviews", icon: MessageSquareMore },
+    { href: "/ratings", label: "Ratings", icon: MessageSquareMore },
     { href: "/community", label: "Community", icon: MapPin },
     { href: "/friends", label: "Friends", icon: Users },
   ];
@@ -48,59 +48,61 @@ export default function RootLayout({
       >
         <div className="flex min-h-screen bg-secondary">
           {/* Sidebar for desktop */}
-          <aside className="z-10 hidden md:flex flex-col w-64 bg-white text-gray-900 p-4 border-r border-gray-200">
-            <Link href="/" className="mx-auto">
-              <Logo className="mb-4 p-2" theme="light" />
-            </Link>
-            <nav className="space-y-1">
-              {navItems.map(({ href, label, icon: Icon }) => {
-                const isActive = pathname === href;
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md font-medium transition-colors ${
-                      isActive
-                        ? "bg-blue-50 text-blue-600"
-                        : "hover:bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    <Icon
-                      className={`w-5 h-5 ${
-                        isActive ? "text-blue-600" : "text-gray-400"
+          <aside className="z-10 hidden md:flex flex-col w-64 bg-white text-gray-900 border-r border-gray-200">
+            <div className="fixed w-64 p-4 grid items-center">
+              <Link href="/" className="mx-auto">
+                <Logo className="mb-4 p-2" theme="light" />
+              </Link>
+              <nav className="space-y-1">
+                {navItems.map(({ href, label, icon: Icon }) => {
+                  const isActive = pathname === href;
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md font-medium transition-colors ${
+                        isActive
+                          ? "bg-blue-50 text-blue-600"
+                          : "hover:bg-gray-100 text-gray-700"
                       }`}
-                    />
-                    <span>{label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+                    >
+                      <Icon
+                        className={`w-5 h-5 ${
+                          isActive ? "text-blue-600" : "text-gray-400"
+                        }`}
+                      />
+                      <span>{label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
           </aside>
 
           {/* Main content */}
           <main className="flex-1 pb-16 md:pb-4 pattern-bg relative overflow-hidden">
             {/* Background text container */}
             <div className="select-none whitespace-nowrap pointer-events-none opacity-1 absolute inset-0 overflow-hidden">
-              <p className="font-extrabold text-secondary-foreground absolute top-20 right-30 transform rotate-[30deg] scale-1600 hidden md:block">
+              <p className="font-extrabold text-secondary-foreground fixed top-20 right-30 transform rotate-[30deg] scale-1600 hidden md:block">
                 ALWAYS
               </p>
-              <p className="font-extrabold text-secondary-foreground absolute top-50 right-80 transform rotate-[30deg] scale-1600 hidden md:block">
+              <p className="font-extrabold text-secondary-foreground fixed top-50 right-80 transform rotate-[30deg] scale-1600 hidden md:block">
                 WATCHING
               </p>
-              <p className="font-extrabold text-secondary-foreground absolute top-80 right-130 transform rotate-[30deg] scale-1600 hidden md:block">
+              <p className="font-extrabold text-secondary-foreground fixed top-80 right-130 transform rotate-[30deg] scale-1600 hidden md:block">
                 GOTOSLEEP
               </p>
-              <p className="font-extrabold text-secondary-foreground absolute top-110 right-180 transform rotate-[30deg] scale-1600 hidden md:block">
+              <p className="font-extrabold text-secondary-foreground fixed top-110 right-180 transform rotate-[30deg] scale-1600 hidden md:block">
                 MYLIFEMYSCORE
               </p>
-              <p className="font-extrabold text-secondary-foreground absolute top-140 right-240 transform rotate-[30deg] scale-1600 hidden md:block">
+              <p className="font-extrabold text-secondary-foreground fixed top-140 right-240 transform rotate-[30deg] scale-1600 hidden md:block">
                 RATEEVERYTHING
               </p>
-              <p className="font-extrabold text-secondary-foreground absolute top-180 right-290 transform rotate-[30deg] scale-1600 hidden md:block">
+              <p className="font-extrabold text-secondary-foreground fixed top-180 right-290 transform rotate-[30deg] scale-1600 hidden md:block">
                 NOESCAPE
               </p>
             </div>
-            <Fingerprint className="text-secondary-foreground absolute top-20 right-30 transform rotate-[30deg] scale-1600 md:hidden opacity-10" />
+            <Fingerprint className="fixed text-secondary-foreground top-20 right-30 transform rotate-[30deg] scale-1600 md:hidden opacity-10" />
             <div className="relative">
               <Logo className="mb-2 pl-4 pt-4 mx-auto md:hidden" theme="dark" />
               {children}
