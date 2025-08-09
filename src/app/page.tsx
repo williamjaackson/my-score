@@ -2,38 +2,65 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Fingerprint } from "lucide-react";
 import MyScore from "./components/MyScore";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
+import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { RedirectType } from "next/navigation";
 
-export default function Home() {
-  const name = "William Jackson";
-  const firstName = name.split(" ")[0];
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("session-token")?.value;
+  const decodedToken = jwt.decode(token || "");
+  const userId =
+    typeof decodedToken === "object" &&
+    decodedToken !== null &&
+    "userId" in decodedToken
+      ? (decodedToken.userId as string)
+      : undefined;
+
+  if (!userId) {
+    // redirect to /register
+    return redirect("/register", RedirectType.replace);
+  }
+
+  const name = await prisma?.user
+    .findUnique({
+      where: { id: userId },
+      select: { name: true },
+    })
+    .then((user) => user?.name || "Unknown User");
+  const firstName = name?.split(" ")[0];
 
   return (
     <>
-      <Card className="w-min mx-auto my-10 rounded-full">
-        <CardContent>
-          <MyScore />
-        </CardContent>
-      </Card>
-      <div className="grid grid-cols-2 gap-4 mt-10">
-        {/* two cards. card 1: GOod Morning, Wil */}
-        <Card>
-          {/* <CardHeader>
-            <CardTitle></CardTitle>
-          </CardHeader> */}
+      <div className="md:p-4">
+        <Card className="w-min mx-auto md:my-10 rounded-full">
           <CardContent>
-            <p>Good Morning,</p>
-            <p className="text-2xl font-semibold">William Jackson</p>
+            <MyScore />
           </CardContent>
         </Card>
-        <Card>
-          {/* <CardHeader>
+        <div className="grid md:grid-cols-2 gap-4 mt-10">
+          {/* two cards. card 1: GOod Morning, Wil */}
+          <Card className="min-h-screen md:min-h-0">
+            {/* <CardHeader>
             <CardTitle></CardTitle>
           </CardHeader> */}
-          <CardContent>
-            <p>Good Morning,</p>
-            <p className="text-2xl font-semibold">William Jackson</p>
-          </CardContent>
-        </Card>
+            <CardContent>
+              <p>Good Morning,</p>
+              <p className="text-2xl font-semibold">{name}</p>
+            </CardContent>
+          </Card>
+          <Card className="hidden md:block">
+            {/* <CardHeader>
+            <CardTitle></CardTitle>
+          </CardHeader> */}
+            <CardContent>
+              <p>Good Morning,</p>
+              <p className="text-2xl font-semibold">William Jackson</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );

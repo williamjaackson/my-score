@@ -1,22 +1,58 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Register() {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
+
+    const name = `${firstName} ${lastName}`;
+
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      toast.error(
+        `Registration failed: ${errorData.message || "Unknown error"}`
+      );
+      console.error("Registration error:", errorData);
+      return;
+    }
+
+    const data = await response.json();
+    console.log("Registration successful:", data);
+    // Handle successful registration (e.g., redirect or show success message)
+    window.location.href = "/";
+  }
+
   return (
-    <div className="w-full flex items-center justify-center p-6">
-      <Card className="w-full max-w-2xl shadow-lg">
+    <div className="w-full md:max-w-2xl mx-auto justify-center px-6 md:p-6">
+      <Card className="w-full shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-gray-800">
             Register with myScore
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="space-y-5">
-            <div className="flex gap-4">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <div className="flex flex-col md:flex-row gap-4">
               {/* First Name */}
-              <div className="w-1/2 space-y-2">
+              <div className="w-full space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
                   type="text"
@@ -27,7 +63,7 @@ export default function Register() {
                 />
               </div>
               {/* Last Name */}
-              <div className="w-1/2 space-y-2">
+              <div className="w-full space-y-2">
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input
                   type="text"
