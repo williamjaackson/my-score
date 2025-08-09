@@ -13,8 +13,8 @@ export async function GET(
       id: userId,
     },
     select: {
-      ratings: true,
-      sentRating: true,
+      ratingsReceived: true,
+      ratingsGiven: true,
     },
   });
 
@@ -39,7 +39,7 @@ export async function POST(
     where: {
       targetId: userId,
       authorId: authorId,
-      lastRatedAt: {
+      updatedAt: {
         gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Check if rated in the last 24 hours
       },
     },
