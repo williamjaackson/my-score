@@ -77,5 +77,9 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/users/:path*", "/api/auth/verify", "/api/location/:path*"],
+  matcher: [
+    "/api/users/:path*",
+    "/api/auth/(verify|me)",
+    "/api/location/:path*",
+  ],
 };
