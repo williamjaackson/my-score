@@ -86,7 +86,7 @@ export default function RootLayout({
           <ScoreProvider>
             <main className="flex-1 pb-16 md:pb-4 pattern-bg relative overflow-hidden">
               {/* Background text container */}
-              <div className="select-none whitespace-nowrap pointer-events-none opacity-1 absolute inset-0 overflow-hidden">
+              <div className="select-none whitespace-nowrap pointer-events-none opacity-2 absolute inset-0 overflow-hidden">
                 <p className="font-extrabold text-secondary-foreground fixed top-20 right-30 transform rotate-[30deg] scale-1600 hidden md:block">
                   ALWAYS
                 </p>
