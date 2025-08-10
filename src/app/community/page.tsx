@@ -80,10 +80,10 @@ export default function CommunityPage() {
                     <span>Total time near: {user.totalTimeSpentNear} min</span>
                   </div>
                   <div className="flex gap-2 text-xs">
-                    <span>Rating: {user.profile.ratingScore}</span>
-                    <span>Relation: {user.profile.relationScore}</span>
-                    <span>Criminal: {user.profile.criminalScore}</span>
-                    <span>Other: {user.profile.otherScore}</span>
+                    <span>Rating: {user.profile?.ratingScore}</span>
+                    <span>Relation: {user.profile?.relationScore}</span>
+                    <span>Criminal: {user.profile?.criminalScore}</span>
+                    <span>Other: {user.profile?.otherScore}</span>
                   </div>
                 </div>
               </CardContent>

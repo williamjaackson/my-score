@@ -4,7 +4,7 @@ export async function classifyGovernmentSentiment(
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return null; // silently skip if no key configured
 
-  const prompt = `You are a strict classifier. Analyse the following wall post text for sentiment about the government or a social credit system. Rules:\n- If the text clearly expresses positive or supportive sentiment toward government or social credit (myscore, anything about a score), output EXACTLY 1.\n- If it clearly or vaugely expresses negative, critical, or opposing sentiment, output EXACTLY 0.\n OUTPUT 0 if the user might be hinting towards credit being bad.\n- If it does not mention government or social credit at all, or is ambiguous/neutral, output EXACTLY 0.5.\nReturn ONLY the number (0, 0.5, or 1).\n\nText: "${text.replace(
+  const prompt = `You are a strict classifier. Analyse the following wall post text for sentiment about the government or a social credit system. Rules:\n- If the text clearly expresses positive or supportive sentiment toward government or social credit (myscore, anything about a score), or just endorsing it, output EXACTLY 1.\n- If it clearly or vaugely expresses negative, critical, or opposing sentiment, output EXACTLY 0.\n OUTPUT 0 if the user might be hinting towards credit being bad.\n- If it does not mention government or social credit at all, or is ambiguous/neutral, output EXACTLY 0.5.\nReturn ONLY the number (0, 0.5, or 1).\n\nText: "${text.replace(
     /"/g,
     '\\"'
   )}"`;

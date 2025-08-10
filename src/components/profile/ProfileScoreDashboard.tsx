@@ -110,7 +110,7 @@ export function ProfileScoreDashboard({ userId }: { userId: string }) {
           <div className="flex items-center justify-center">
             {/* Use a single aggregate segment so the ring fill represents total progress */}
             <CircularScore
-              score={data.totalScore}
+              sepScore={data.totalScore}
               maxScore={1000}
               radius={80}
               strokeWidth={18}
