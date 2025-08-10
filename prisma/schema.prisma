@@ -36,6 +36,7 @@ model User {
   proximitySessionsAsNearby ProximitySession[]   @relation("NearbyUserProximitySessions")
   proximityTotalsAsUser     UserProximityTotal[] @relation("UserProximityTotals")
   proximityTotalsAsNearby   UserProximityTotal[] @relation("NearbyUserProximityTotals")
+  faceDescriptor            FaceDescriptor?   // Relation to FaceDescriptor
 
   // Wall / global chat
   wallPosts WallPost[]
@@ -155,4 +156,14 @@ model WallPost {
 
   @@index([userId])
   @@index([createdAt])
+}
+model FaceDescriptor {
+  id         String   @id @default(cuid())
+  descriptor Json
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
 }

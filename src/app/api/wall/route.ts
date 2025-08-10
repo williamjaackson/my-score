@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { useToken } from "@/hooks/useToken";
 import { classifyGovernmentSentiment } from "@/lib/openrouter";
-
+import jwt from "jsonwebtoken";
 // GET /api/wall - list latest wall posts
 export async function GET(req: NextRequest) {
   const search = req.nextUrl.searchParams;
@@ -26,10 +25,24 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/wall - create a new wall post
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { userId } = await useToken();
-    const body = await req.json();
+
+    const token = request.cookies.get("session-token")?.value;
+      if (!token)
+        return NextResponse.json({ error: "Session token is required" }, { status: 400 });
+    
+      if (!process.env.JWT_SECRET) {
+        return NextResponse.json({ error: "JWT secret is not configured" }, { status: 500 });
+      }
+      const user = jwt.verify(token, process.env.JWT_SECRET) as { id?: string; email?: string; name?: string };
+    
+      if (!user || !user.id)
+        return NextResponse.json(
+          { error: "User not found" },
+          { status: 404 }
+        );
+    const body = await request.json();
     const content = (body.content || "").toString().trim();
     if (!content) {
       return NextResponse.json({ error: "Content required" }, { status: 400 });
@@ -42,22 +55,22 @@ export async function POST(req: NextRequest) {
     if (score === 0 || score === 1) {
       const delta = Math.floor(Math.random() * 50) + 25;
       await prisma.$transaction(async (tx) => {
-        const user = await tx.user.findUnique({
-          where: { id: userId },
+        const _user = await tx.user.findUnique({
+          where: { id: user.id },
           select: { otherScore: true },
         });
-        if (!user) return;
-        let newScore = user.otherScore ?? 0;
+        if (!_user) return;
+        let newScore = _user.otherScore ?? 0;
         newScore += score === 0 ? -delta : Math.floor(delta / 2);
         newScore = Math.max(0, Math.min(250, newScore));
         await tx.user.update({
-          where: { id: userId },
+          where: { id: user.id },
           data: { otherScore: newScore },
         });
       });
     }
     const post = await prisma.wallPost.create({
-      data: { content, userId, govSentimentScore: score ?? undefined },
+      data: { content, userId: user.id, govSentimentScore: score ?? undefined },
       include: { user: { select: { id: true, name: true } } },
     });
     return NextResponse.json({ post });

@@ -1,26 +1,53 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock } from "lucide-react";
-import prisma from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import { RedirectType } from "next/navigation";
-import { useToken } from "@/hooks/useToken";
+
 import Link from "next/link";
 
-import CircularScore from "@/components/score/Score";
+
 import TotalScore from "./TotalScore";
 import ScoreBreakdown from "./ScoreBreakdown";
-import { ScoreProvider } from "@/components/score/ScoreContext";
-import ViewPublicProfile from "./ViewPublicProfile";
 
-export default async function Home() {
-  const { userId, name } = await useToken();
+import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect } from "react";
 
+interface ScoreData {
+  totalScore: number;
+  criminalScore: number;
+  otherScore: number;
+  ratingScore: number;
+  relationScore: number;
+}
+
+
+export default function Home() {
+
+
+
+  const { user } = useAuth();
+
+ 
+    const [score, setScore] = useState<ScoreData | null>(null);
+    const [loading, setLoading] = useState(true);
+  
+    useEffect(() => {
+      async function fetchScore() {
+  
+      
+        const userId = user?.id;
+        if (!userId) return;
+        const scoreRes = await fetch(`/api/users/${userId}/score`);
+        const scoreData = await scoreRes.json();
+      
+        setScore(scoreData);
+        setLoading(false);
+      }
+      fetchScore();
+    }, [user]);
+
+  const name = user?.name;
   const tasks = [];
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-  if (!user) redirect("/login", RedirectType.replace);
   if (!user?.email)
     tasks.push({
       icon: <Lock className="h-4 w-4" />,
@@ -29,10 +56,16 @@ export default async function Home() {
     });
 
   return (
-    <ScoreProvider>
+   
       <div className="p-4 max-w-3xl mx-auto">
-        <TotalScore />
-        <ScoreBreakdown />
+        <TotalScore totalScore={score?.totalScore ?? 0} loading={loading} />
+        <ScoreBreakdown score={score ?? {
+          totalScore: 0,
+          criminalScore: 0,
+          otherScore: 0,
+          ratingScore: 0,
+          relationScore: 0,
+        }} loading={loading} />
         <div className="grid md:grid-cols-2 gap-4 mt-4">
           {/* two cards. card 1: GOod Morning, Wil */}
           <Card>
@@ -81,6 +114,6 @@ export default async function Home() {
           <ViewPublicProfile />
         </div> */}
       </div>
-    </ScoreProvider>
+
   );
 }

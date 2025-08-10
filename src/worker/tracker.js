@@ -14,7 +14,7 @@ class ProximityTracker {
     constructor() {
         this.cronJob = null;
         this.batchStoreJob = null;
-        this.proximityRadius = 100; // 100 meters
+        this.proximityRadius = 10; // 100 meters
     }
 
     start() {
@@ -70,6 +70,9 @@ class ProximityTracker {
     }
 
     async checkUserProximity(userId) {
+        const previousNearbyKey = `current_nearby:${userId}`;
+        let currentNearbyIds = [];
+
         try {
             const coords = await redis.geopos("user_locations", userId);
             if (!coords || !coords[0]) return;
@@ -88,12 +91,11 @@ class ProximityTracker {
                 "WITHDIST"
             );
 
-            const currentNearbyIds = nearbyUsers
+            currentNearbyIds = nearbyUsers
                 .filter(([id]) => id !== userId)
                 .map(([id]) => id);
 
             // Get previously nearby users
-            const previousNearbyKey = `current_nearby:${userId}`;
             const previousNearby = await redis.smembers(previousNearbyKey);
 
             // Check for new proximities (enter events)
@@ -122,6 +124,16 @@ class ProximityTracker {
 
         } catch (error) {
             console.error(`Error checking proximity for user ${userId}:`, error);
+            // If there was an error during processing, restore the previous state
+            try {
+                await redis.del(previousNearbyKey);
+                if (currentNearbyIds.length > 0) {
+                    await redis.sadd(previousNearbyKey, ...currentNearbyIds);
+                    await redis.expire(previousNearbyKey, 300);
+                }
+            } catch (cleanupError) {
+                console.error(`Error during cleanup for user ${userId}:`, cleanupError);
+            }
         }
     }
 
@@ -130,18 +142,26 @@ class ProximityTracker {
         const key = `proximity:${userId}:${nearbyUserId}`;
 
         if (action === 'enter') {
-            const sessionId = await this.createProximitySession(userId, nearbyUserId, timestamp, 0);
-            if (!sessionId) {
-                console.error(`Failed to create session for ${userId} - ${nearbyUserId}`);
-                return;
+            try {
+                const sessionId = await this.createProximitySession(userId, nearbyUserId, timestamp, 0);
+                if (!sessionId) {
+                    await redis.del(key);
+                    console.error(`Failed to create session for ${userId} - ${nearbyUserId}`);
+                    return;
+                }
+                await redis.hset(key, 'startTime', timestamp, 'sessionId', sessionId);
+                console.log(`User ${userId} entered proximity of ${nearbyUserId}`);
+            } catch (error) {
+                // Clean up Redis if database operation failed
+                await redis.del(key);
+                console.error(`Error in enter proximity event, cleaned up Redis: ${error}`);
             }
-            await redis.hset(key, 'startTime', timestamp, 'sessionId', sessionId);
-            console.log(`User ${userId} entered proximity of ${nearbyUserId}`);
         } else if (action === 'inProximity') {
             // Just verify the session exists, no duration calculation needed
             const startTime = await redis.hget(key, 'startTime');
             const sessionId = await redis.hget(key, 'sessionId');
             if (!startTime || !sessionId) {
+                
                 console.error(`No active session found for ${userId} - ${nearbyUserId}`);
                 return;
             }
@@ -152,24 +172,32 @@ class ProximityTracker {
             if (startTime && sessionId) {
                 const duration = timestamp - parseInt(startTime);
 
-                // Store total time in Redis for batch processing
-                const totalTimeKey = `total_time_near:${userId}:${nearbyUserId}`;
-                const exists = await redis.hexists(totalTimeKey, 'totalMs');
-                if (!exists) {
-                    await redis.hset(totalTimeKey, 'totalMs', 0);
+                try {
+                    // Store total time in Redis for batch processing
+                    const totalTimeKey = `total_time_near:${userId}:${nearbyUserId}`;
+                    const exists = await redis.hexists(totalTimeKey, 'totalMs');
+                    if (!exists) {
+                        await redis.hset(totalTimeKey, 'totalMs', 0);
+                    }
+                    await redis.hincrby(totalTimeKey, 'totalMs', duration);
+
+                    // End the proximity session in database
+                    await this.endProximitySession(parseInt(sessionId), parseInt(startTime), timestamp);
+
+                    // Clean up Redis session data only after successful database update
+                    await redis.hdel(key, 'startTime', 'sessionId');
+
+                    console.log(`User ${userId} exited proximity of ${nearbyUserId}, duration: ${Math.round(duration / 1000)}s`);
+                } catch (error) {
+                    // If database operation failed, clean up the total time accumulation
+                    const totalTimeKey = `total_time_near:${userId}:${nearbyUserId}`;
+                    await redis.hincrby(totalTimeKey, 'totalMs', -duration);
+                    console.error(`Error in exit proximity event, rolled back Redis accumulation: ${error}`);
                 }
-                await redis.hincrby(totalTimeKey, 'totalMs', duration);
-
-                // Clean up Redis session data
-                await redis.hdel(key, 'startTime', 'sessionId');
-
-                // End the proximity session in database
-                await this.endProximitySession(parseInt(sessionId), parseInt(startTime), timestamp);
-
-                console.log(`User ${userId} exited proximity of ${nearbyUserId}, duration: ${Math.round(duration / 1000)}s`);
             }
         }
     }
+
 
     async createProximitySession(userId, nearbyUserId, startTime, duration) {
         try {
@@ -209,24 +237,29 @@ class ProximityTracker {
             console.log(`Found ${keys.length} total_time_near keys to process`);
 
             for (const key of keys) {
-                const keyParts = key.split(':');
-              
+                try {
+                    const keyParts = key.split(':');
+                    const userId = keyParts[1];
+                    const nearbyUserId = keyParts[2];
+                    const totalMs = await redis.hget(key, 'totalMs');
 
-                const userId = keyParts[1];
-                const nearbyUserId = keyParts[2];
-                const totalMs = await redis.hget(key, 'totalMs');
-                
-                console.log(`Processing key: ${key}, userId: ${userId}, nearbyUserId: ${nearbyUserId}, totalMs: ${totalMs}`);
+                    console.log(`Processing key: ${key}, userId: ${userId}, nearbyUserId: ${nearbyUserId}, totalMs: ${totalMs}`);
 
-                if (totalMs && parseInt(totalMs) > 0) {
-                    await this.updateTotalProximityTime(userId, nearbyUserId, parseInt(totalMs));
-                    await redis.del(key); // Clear after storing
+                    if (totalMs && parseInt(totalMs) > 0) {
+                        await this.updateTotalProximityTime(userId, nearbyUserId, parseInt(totalMs));
+                        // Only delete if database update was successful
+                        await redis.del(key);
+                    }
+                } catch (error) {
+                    console.error(`Error processing key ${key}, keeping in Redis for retry: ${error}`);
+                    // Don't delete the key if processing failed - it will be retried next batch
                 }
             }
         } catch (error) {
             console.error('Error in batch store:', error);
         }
     }
+
 
     async updateTotalProximityTime(userId, nearbyUserId, additionalMs) {
         try {

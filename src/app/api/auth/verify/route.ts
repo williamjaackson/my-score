@@ -2,23 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 const bcrypt = require("bcrypt");
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { email, password } = body;
+ const token = request.cookies.get("session-token")?.value;
+  if (!token)
+    return NextResponse.json({ error: "Session token is required" }, { status: 400 });
 
-  const userId = request.headers.get("x-user-id");
-  if (!userId)
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+  if (!process.env.JWT_SECRET) {
+    return NextResponse.json({ error: "JWT secret is not configured" }, { status: 500 });
+  }
+  const user = jwt.verify(token, process.env.JWT_SECRET) as { id?: string; email?: string; name?: string };
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!user)
+  if (!user || !user.id)
     return NextResponse.json(
-      { error: "User not found: " + userId },
+      { error: "User not found" },
       { status: 404 }
     );
 
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
     );
 
   await prisma.user.update({
-    where: { id: userId },
+    where: { id: user.id },
     data: {
       email,
       password: await bcrypt.hash(password, 10),

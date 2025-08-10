@@ -1,7 +1,12 @@
-import React from "react";
+"use client";
+
+
+import React, { useEffect, useState } from "react";
+
+
 
 export default function CircularScore({
-  score = 250,
+  sepScore = 250,
   maxScore = 1000,
   radius = 110,
   strokeWidth = 20,
@@ -13,6 +18,7 @@ export default function CircularScore({
   label = "",
   labelFontSize = "",
 }) {
+  
   const circumference = 2 * Math.PI * radius;
   const size = radius * 2 + strokeWidth;
 
@@ -74,7 +80,7 @@ export default function CircularScore({
               pointerEvents: "none",
             }}
           >
-            {score}
+            {sepScore}
           </span>
         )}
 

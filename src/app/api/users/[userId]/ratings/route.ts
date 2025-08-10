@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-
+import jwt from "jsonwebtoken";
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
@@ -24,7 +24,22 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
-  const authorId = request.headers.get("x-user-id");
+   const token = request.cookies.get("session-token")?.value;
+    if (!token)
+      return NextResponse.json({ error: "Session token is required" }, { status: 400 });
+  
+    if (!process.env.JWT_SECRET) {
+      return NextResponse.json({ error: "JWT secret is not configured" }, { status: 500 });
+    }
+    const user = jwt.verify(token, process.env.JWT_SECRET) as { id?: string; email?: string; name?: string };
+  
+    if (!user || !user.id)
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+  
+  const authorId = user?.id;
   const { userId } = await params;
   const body = await request.json();
   const { rating, comment } = body;

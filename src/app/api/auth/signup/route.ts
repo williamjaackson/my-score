@@ -22,9 +22,10 @@ export async function POST(request: NextRequest) {
     },
   });
 
+
   const token = jwt.sign(
     {
-      userId: user.id,
+      id: user.id,
       name: user.name,
     },
     process.env.JWT_SECRET!,

@@ -3,10 +3,17 @@
 import CircularScore from "@/components/score/Score";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { useScore } from "@/components/score/ScoreContext";
+interface ScoreData {
+  totalScore: number;
+  criminalScore: number;
+  otherScore: number;
+  ratingScore: number;
+  relationScore: number;
+}
 
-export default function ScoreBreakdown() {
-  const { score, loading } = useScore();
+
+export default function ScoreBreakdown({score, loading}: {score: ScoreData, loading: boolean}) {
+
   const scores = {
     criminal: score?.criminalScore ?? 0,
     other: score?.otherScore ?? 0,
@@ -23,7 +30,7 @@ export default function ScoreBreakdown() {
         {/* Scores Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 flex-1 justify-center">
           <CircularScore
-            score={loading ? 0 : scores.rating}
+            sepScore={loading ? 0 : scores.rating}
             maxScore={250}
             radius={50}
             strokeWidth={10}
@@ -33,7 +40,7 @@ export default function ScoreBreakdown() {
             label="Rating"
           />
           <CircularScore
-            score={loading ? 0 : scores.relation}
+            sepScore={loading ? 0 : scores.relation}
             maxScore={250}
             radius={50}
             strokeWidth={10}
@@ -43,7 +50,7 @@ export default function ScoreBreakdown() {
             label="Community"
           />
           <CircularScore
-            score={loading ? 0 : scores.criminal}
+            sepScore={loading ? 0 : scores.criminal}
             maxScore={250}
             radius={50}
             strokeWidth={10}
@@ -53,7 +60,7 @@ export default function ScoreBreakdown() {
             label="Criminal"
           />
           <CircularScore
-            score={loading ? 0 : scores.other}
+            sepScore={loading ? 0 : scores.other}
             maxScore={250}
             radius={50}
             strokeWidth={10}

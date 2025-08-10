@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import redis from "@/lib/redis";
 import prisma from "@/lib/prisma";
-
+import jwt from "jsonwebtoken";
 export async function GET(request: NextRequest) {
-  const userId = await request.headers.get("x-user-id");
+ 
+ const token = request.cookies.get("session-token")?.value;
+  if (!token)
+    return NextResponse.json({ error: "Session token is required" }, { status: 400 });
+
+  if (!process.env.JWT_SECRET) {
+    return NextResponse.json({ error: "JWT secret is not configured" }, { status: 500 });
+  }
+  const user = jwt.verify(token, process.env.JWT_SECRET) as { id?: string; email?: string; name?: string };
+
+  if (!user || !user.id)
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    );
+  const userId = user.id;
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }
@@ -24,7 +39,7 @@ export async function GET(request: NextRequest) {
       longitude,
       latitude,
       "BYRADIUS",
-      1, 
+      10, 
       "m",
       "WITHDIST",
       "WITHCOORD",

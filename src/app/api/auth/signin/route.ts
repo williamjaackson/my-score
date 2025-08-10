@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   // Create JWT token for session
   const token = jwt.sign(
     {
-      userId: user.id,
+      id: user.id,
       name: user.name,
     },
     process.env.JWT_SECRET!,
