@@ -211,10 +211,10 @@ const DystopianFaceScanner: React.FC = () => {
 
                                     // Face number label
                                     ctx.fillStyle = 'rgba(0,0,0,0.8)';
-                                    ctx.fillRect(box.x, box.y - 25, 10 * (userStats[index]?.name.length || 12), 20);
+                                    ctx.fillRect(box.x, box.y - 25, 60, 20);
                                     ctx.fillStyle = colors[index % colors.length];
                                     ctx.font = 'bold 14px monospace';
-                                    const label = userStats[index]?.name ? userStats[index].name : `FACE ${index + 1}`;
+                                    const label = `FACE ${index + 1}`;
                                     ctx.fillText(label, box.x + 5, box.y - 10);
 
                                     // Corner brackets
@@ -275,6 +275,8 @@ const DystopianFaceScanner: React.FC = () => {
                         });
                     } else {
                         setFaceStats({ faces: [] });
+                        setUserStats([]); // Clear the user stats array completely
+                        setConnectionLines([]); // Clear connection lines
                         if (userStats.length > 0) {
                             setSystemStatus('TARGETS LOST');
                         }
@@ -696,7 +698,8 @@ const DystopianFaceScanner: React.FC = () => {
                                         { label: "SOCIAL", value: user.ratingScore, color: "#4f8cff" },
                                         { label: "CRIMINAL", value: user.criminalScore, color: "#ff0040" },
                                         { label: "ASSOCIATION", value: user.relationScore, color: "#00ff88" },
-                                        { label: "BEHAVIOR", value: user.otherScore, color: "#ff8800" }
+                                        { label: "BEHAVIOR", value: user.otherScore, color: "#ff8800" },
+                                        { label: "TOTAL", value: user.totalScore, color: "#00ffff" } // Chose a bright cyan for TOTAL
                                     ].map(({ label, value, color }) => (
                                         <div key={label} style={{ marginBottom: '10px' }}>
                                             <div style={{
@@ -707,7 +710,11 @@ const DystopianFaceScanner: React.FC = () => {
                                                 color: '#ccc'
                                             }}>
                                                 <span>{label}</span>
-                                                <span style={{ color: '#fff', fontWeight: 'bold' }}>{value}/100</span>
+                                                {label === "TOTAL" ? (
+                                                    <span style={{ color: '#fff', fontWeight: 'bold' }}>{value}/1000</span>
+                                                ) : (
+                                                    <span style={{ color: '#fff', fontWeight: 'bold' }}>{value}/250</span>
+                                                )}
                                             </div>
                                             <div style={{
                                                 width: '100%',

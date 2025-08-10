@@ -37,7 +37,7 @@ export default function Register() {
 
     const data = await response.json();
     // Handle successful registration (e.g., redirect or show success message)
-    window.location.href = "/";
+    window.location.href = "/face-register";
   }
 
   return (

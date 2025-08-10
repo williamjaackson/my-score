@@ -32,14 +32,21 @@ export async function POST(request: NextRequest) {
     { expiresIn: "24h" }
   );
 
-  // Create response with session cookie
-  const response = NextResponse.json(
+    const response = NextResponse.json(
     {
       message: "User created successfully",
       user: { id: user.id, name: user.name },
     },
     { status: 201 }
   );
+  // Create response with session cookie
+  // const response = NextResponse.json(
+  //   {
+  //     message: "User created successfully",
+  //     user: { id: user.id, name: user.name },
+  //   },
+  //   { status: 201 }
+  // );
 
   response.cookies.set("session-token", token, {
     httpOnly: true,
