@@ -191,6 +191,16 @@ const DystopianFaceScanner: React.FC = () => {
                         });
 
                         setFaceStats({ faces });
+                        setUserStats(prev => {
+                            const newStats = new Array(faces.length).fill(null);
+                            // Preserve existing data for faces that are still present
+                            for (let i = 0; i < Math.min(prev.length, faces.length); i++) {
+                                if (prev[i]) {
+                                    newStats[i] = prev[i];
+                                }
+                            }
+                            return newStats;
+                        });
 
                         // Draw targeting system for each face
                         if (canvasRef.current) {
@@ -626,7 +636,7 @@ const DystopianFaceScanner: React.FC = () => {
                 </div>
 
                 {/* Subject profiles */}
-                {userStats.length > 0 && (
+                {userStats.length > 0 && userStats.some(user => user !== null) && (
                     <div
                         data-stats-panel
                         style={{
