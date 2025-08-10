@@ -9,6 +9,7 @@ import {
   Home as HomeIcon,
   MapPin,
   MessageSquareMore,
+  User,
   Users,
 } from "lucide-react";
 // import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ export default function RootLayout({
 
   const navItems = [
     { href: "/", label: "Home", icon: HomeIcon },
-    { href: "/ratings", label: "Ratings", icon: MessageSquareMore },
+    { href: "/profile", label: "Public Profile", icon: User },
     { href: "/community", label: "Community", icon: MapPin },
     { href: "/perks", label: "Perks", icon: Gift },
   ];

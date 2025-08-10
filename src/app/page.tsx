@@ -77,9 +77,9 @@ export default async function Home() {
             </CardContent>
           </Card>
         </div>
-        <div className="mx-auto w-fit my-4 text-white">
+        {/* <div className="mx-auto w-fit my-4 text-white">
           <ViewPublicProfile />
-        </div>
+        </div> */}
       </div>
     </ScoreProvider>
   );
