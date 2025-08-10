@@ -43,6 +43,7 @@ export default function RootLayout({
     { href: "/profile", label: "Public Profile", icon: User },
     { href: "/community", label: "Community", icon: MapPin },
     { href: "/perks", label: "Perks", icon: Gift },
+    { href: "/wall", label: "Wall", icon: MessageSquareMore },
   ];
 
   return (
