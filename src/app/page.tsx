@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Lock } from "lucide-react";
+import { Eye, Lock } from "lucide-react";
 
 import Link from "next/link";
 
@@ -107,9 +107,17 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
-      {/* <div className="mx-auto w-fit my-4 text-white">
-          <ViewPublicProfile />
-        </div> */}
+      <div className="mt-4">
+        <Card>
+          <Link
+            href="/face-retrieve"
+            className="flex items-center gap-2 p-4 hover:bg-gray-100 transition-colors rounded-md"
+          >
+            <Eye className="h-5 w-5 text-gray-600" />
+            <span className="font-medium">Retrieve Face Data</span>
+          </Link>
+        </Card>
+      </div>
     </div>
   );
 }
